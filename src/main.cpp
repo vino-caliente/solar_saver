@@ -1,7 +1,7 @@
 #include <windows.h>
 #include "MainWindow.h"
+#include "Resource.h"
 
-// Обратите внимание: wWinMain!
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
     const wchar_t CLASS_NAME[] = L"SolarSaverWindowClass";
 
@@ -11,6 +11,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     wc.lpszClassName = CLASS_NAME;
     wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wc.hIcon         = LoadIconW(hInstance, MAKEINTRESOURCEW(ID_ICON_APP));
 
     if (!RegisterClassW(&wc)) {
         return 0;
@@ -19,7 +20,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     HWND hwnd = CreateWindowExW(
         0, CLASS_NAME, L"SolarSaver",
         WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 1100, 750,
+        CW_USEDEFAULT, CW_USEDEFAULT, 1000, 700,
         NULL, NULL, hInstance, NULL
     );
 

@@ -1,4 +1,8 @@
 #include "MainWindow.h"
+#include "Renderer.h"
+
+// Создаем глобальное состояние
+SimState g_sim;
 
 LRESULT CALLBACK MainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
@@ -6,17 +10,30 @@ LRESULT CALLBACK MainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
             PostQuitMessage(0);
             return 0;
 
+        case WM_SIZE: 
+            InvalidateRect(hwnd, NULL, TRUE); 
+            return 0;
+
+        case WM_ERASEBKGND: {
+            HDC hdc = (HDC)wParam;
+            RECT rc;
+            GetClientRect(hwnd, &rc);
+            FillRect(hdc, &rc, (HBRUSH)(COLOR_WINDOW + 1));
+            return 1;
+        }
+
         case WM_PAINT: {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hwnd, &ps);
             
-            FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
+            RECT rc;
+            GetClientRect(hwnd, &rc);
             
-            SetTextColor(hdc, RGB(0, 0, 0));
-            SetBkMode(hdc, TRANSPARENT);
-            
-            const wchar_t* text = L"Каркас WinAPI готов. Симуляция в разработке...";
-            TextOutW(hdc, 10, 10, text, (int)wcslen(text));
+            // Очищаем фон
+            FillRect(hdc, &rc, (HBRUSH)(COLOR_WINDOW + 1));
+
+            // Вызываем всю отрисовку через Renderer
+            Renderer::DrawAll(hdc, rc.right, rc.bottom, g_sim);
 
             EndPaint(hwnd, &ps);
             return 0;
