@@ -12,6 +12,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.hIcon         = LoadIconW(hInstance, MAKEINTRESOURCEW(ID_ICON_APP));
+    wc.hbrBackground = CreateSolidBrush(RGB(30, 30, 30)); // Темный фон для правой панели
 
     if (!RegisterClassW(&wc)) {
         return 0;
@@ -19,7 +20,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
     HWND hwnd = CreateWindowExW(
         0, CLASS_NAME, L"SolarSaver",
-        WS_OVERLAPPEDWINDOW,
+        WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
         CW_USEDEFAULT, CW_USEDEFAULT, 1000, 700,
         NULL, NULL, hInstance, NULL
     );
