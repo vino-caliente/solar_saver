@@ -28,6 +28,11 @@ void ResetSimulation() {
     g_sim.isPaused = false;
     
     g_sim.isRainingToday = GenerateTodayWeather();
+
+    // Пересчитываем солнце сразу, чтобы при старте сцена не была полностью черной
+    g_sim.currentSunlight = GetSunlight(g_sim.timeOfDay);
+    if (g_sim.isRainingToday) g_sim.currentSunlight *= 0.2f;
+    g_sim.energyIncomePercent = g_sim.currentSunlight;
 }
 
 void InitSimulation() {
@@ -73,7 +78,13 @@ void UpdateSimulation(float dt_real_seconds) {
         float fromBattery = (deficitWh > g_sim.batteryStoredWh) ? g_sim.batteryStoredWh : deficitWh;
         g_sim.batteryStoredWh -= fromBattery;
         float fromGridWh = deficitWh - fromBattery;
-        g_sim.currentGridPowerW = fromGridWh / dt_hours;
+        
+        // Защита от деления на 0 при очень маленьком dt
+        if (dt_hours > 0.00001f) {
+            g_sim.currentGridPowerW = fromGridWh / dt_hours;
+        } else {
+            g_sim.currentGridPowerW = 0.0f;
+        }
     }
 
     // 4. Статистика
