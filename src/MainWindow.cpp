@@ -47,7 +47,6 @@ LRESULT CALLBACK MainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
         SetTextColor(hdc, RGB(230, 235, 242));
         return (LRESULT)hDarkBgBrush;
     }
-
     case WM_SIZE: {
         int W = LOWORD(lParam), H = HIWORD(lParam);
         int simW = (int)(W * 0.68f);
