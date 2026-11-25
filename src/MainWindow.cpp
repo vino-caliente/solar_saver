@@ -32,7 +32,7 @@ LRESULT CALLBACK MainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
         hBtnReset = CreateWindowW(L"BUTTON", L"↻  Сброс", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 0, 0, 100, 38, hwnd, (HMENU)ID_BTN_RESET, hInst, NULL);
         for (HWND b : {hBtnStart, hBtnPause, hBtnReset}) SendMessage(b, WM_SETFONT, (WPARAM)hUiFont, TRUE);
 
-        hSliderRain  = CreateMySlider(hwnd, hInst, ID_SLIDER_RAIN,  0, 100, 0);
+        hSliderRain  = CreateMySlider(hwnd, hInst, ID_SLIDER_RAIN,  0, 100, (int)(g_sim.rainProbability * 100 + 0.5f));
         hSliderSpeed = CreateMySlider(hwnd, hInst, ID_SLIDER_SPEED, 1, 4, 1);
         hSliderPanel = CreateMySlider(hwnd, hInst, ID_SLIDER_PANEL, 0, 500, 300);
         hSliderLamp  = CreateMySlider(hwnd, hInst, ID_SLIDER_LAMP,  0, 100, 45);
@@ -59,7 +59,7 @@ LRESULT CALLBACK MainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
         MoveWindow(hBtnReset, x + (btnW + buttonGap) * 2, top, btnW, 38, TRUE);
         int sliderW = contentW;
         // The renderer places labels/value rows at these coordinates; sliders sit directly beneath each row.
-        int baseY = 434, step = (H < 760 ? 58 : 68);
+        int baseY = 374, step = (H < 760 ? 58 : 68);
         MoveWindow(hSliderRain,  x, baseY, sliderW, 32, TRUE);
         MoveWindow(hSliderSpeed, x, baseY + step, sliderW, 32, TRUE);
         MoveWindow(hSliderPanel, x, baseY + step * 2, sliderW, 32, TRUE);

@@ -90,34 +90,54 @@ void Renderer::DrawScene(HDC hdc,int W,int H,const SimState& sim) {
     int pad=24,x=simW+pad,contentW=panelW-pad*2;
     HFONT font=MakeFont(16), bold=MakeFont(16,FW_SEMIBOLD), footerFont=MakeFont(16);
     auto old=(HFONT)SelectObject(hdc,font);
-    Text(hdc,x,82,L"SOLARSAVER",RGB(235,241,248));
-    SelectObject(hdc,bold); Text(hdc,x,108,L"Энергия дома",RGB(235,241,248)); SelectObject(hdc,font);
     // Stat tiles
-    int tileY=140,tileH=82,gap=10,tileW=(contentW-gap)/2;
-    RoundBox(hdc,x,tileY,tileW,tileH,12,RGB(38,45,55)); RoundBox(hdc,x+tileW+gap,tileY,tileW,tileH,12,RGB(38,45,55));
-    wchar_t b[128]; swprintf_s(b,L"%.2f",sim.savedKWh); Text(hdc,x+14,tileY+13,L"СЭКОНОМЛЕНО",RGB(154,170,187)); SelectObject(hdc,bold); Text(hdc,x+14,tileY+39,b,RGB(91,210,164)); SelectObject(hdc,font); Text(hdc,x+tileW+gap+14,tileY+13,L"ПОТРЕБЛЕНО",RGB(154,170,187)); swprintf_s(b,L"%.2f",sim.totalConsumedKWh); SelectObject(hdc,bold);Text(hdc,x+tileW+gap+14,tileY+39,b,RGB(235,241,248));SelectObject(hdc,font);
-    int y=tileY+tileH+20;
-    swprintf_s(b,L"%02d:%02d   ·   День %d",(int)sim.timeOfDay,(int)((sim.timeOfDay-(int)sim.timeOfDay)*60),sim.dayNumber); Text(hdc,x,y,b,RGB(232,239,247)); y+=27;
-    Text(hdc,x,y,sim.isRainingToday?L"Дождливая погода":L"Солнечная погода",RGB(165,177,190)); y+=26;
-    swprintf_s(b,L"Солнечная энергия: %.0f%%",sim.energyIncomePercent*100); Text(hdc,x,y,b,RGB(232,239,247)); y+=23;
-    swprintf_s(b,L"Экономия: %.0f%%",sim.savingPercent); Text(hdc,x,y,b,RGB(91,210,164)); y+=24;
-    Text(hdc,x,y,L"Заряд аккумулятора",RGB(158,170,185)); y+=22;
-    const int barW=contentW, barH=16;
-    RoundBox(hdc,x,y,barW,barH,8,RGB(48,56,67));
+    int tileY = 82, tileH = 76, gap = 10, tileW = (contentW - gap) / 2;
+    RoundBox(hdc, x, tileY, tileW, tileH, 12, RGB(38, 45, 55));
+    RoundBox(hdc, x + tileW + gap, tileY, tileW, tileH, 12, RGB(38, 45, 55));
+    
+    wchar_t b[128];
+    swprintf_s(b, L"%.2f кВт·ч", sim.savedKWh);
+    Text(hdc, x + 14, tileY + 12, L"СЭКОНОМЛЕНО", RGB(154, 170, 187));
+    SelectObject(hdc, bold);
+    Text(hdc, x + 14, tileY + 36, b, RGB(91, 210, 164));
+    SelectObject(hdc, font);
+
+    Text(hdc, x + tileW + gap + 14, tileY + 12, L"ПОТРЕБЛЕНО", RGB(154, 170, 187));
+    swprintf_s(b, L"%.2f кВт·ч", sim.totalConsumedKWh);
+    SelectObject(hdc, bold);
+    Text(hdc, x + tileW + gap + 14, tileY + 36, b, RGB(235, 241, 248));
+    SelectObject(hdc, font);
+
+    int y = tileY + tileH + 14;
+    swprintf_s(b, L"%02d:%02d   ·   День %d", (int)sim.timeOfDay, (int)((sim.timeOfDay - (int)sim.timeOfDay) * 60), sim.dayNumber);
+    Text(hdc, x, y, b, RGB(232, 239, 247)); y += 23;
+    
+    Text(hdc, x, y, sim.isRainingToday ? L"Дождливая погода" : L"Солнечная погода", RGB(165, 177, 190)); y += 24;
+    
+    swprintf_s(b, L"Солнечная энергия: %.0f%%", sim.energyIncomePercent * 100);
+    Text(hdc, x, y, b, RGB(232, 239, 247)); y += 24;
+    
+    swprintf_s(b, L"Экономия: %.0f%%", sim.savingPercent);
+    Text(hdc, x, y, b, RGB(91, 210, 164)); y += 27;
+    
+    Text(hdc, x, y, L"Заряд аккумулятора", RGB(158, 170, 185)); y += 24;
+    
+    const int barW = contentW, barH = 14;
+    RoundBox(hdc, x, y, barW, barH, 7, RGB(48, 56, 67));
     float chargeRatio = (sim.batteryCapacityWh > 0.0f) ? sim.batteryStoredWh / sim.batteryCapacityWh : 0.0f;
-    chargeRatio = std::clamp(chargeRatio,0.0f,1.0f);
-    int chargeW=(int)(barW*chargeRatio);
-    if(chargeW>0) RoundBox(hdc,x,y,chargeW,barH,8,RGB(91,210,164));
-    swprintf_s(b,L"%.0f / %.0f Вт·ч",sim.batteryStoredWh,sim.batteryCapacityWh);
-    Text(hdc,x,y+22,b,RGB(232,239,247)); y+=48;
+    chargeRatio = std::clamp(chargeRatio, 0.0f, 1.0f);
+    int chargeW = (int)(barW * chargeRatio);
+    if (chargeW > 0) RoundBox(hdc, x, y, chargeW, barH, 7, RGB(91, 210, 164));
+    
+    swprintf_s(b, L"%.0f / %.0f Вт·ч", sim.batteryStoredWh, sim.batteryCapacityWh);
+    Text(hdc, x, y + 18, b, RGB(232, 239, 247));
+    y+=28;
     // Controls captions are placed above their corresponding slider positions in MainWindow.
-    int baseY=410, step=(H<760?58:68);
+    int baseY=350, step=(H<760?58:68);
     LabelValue(hdc,x,baseY,contentW,L"Вероятность дождя",(swprintf_s(b,L"%d%%",(int)(sim.rainProbability*100)),b));
     LabelValue(hdc,x,baseY+step,contentW,L"Скорость симуляции",(swprintf_s(b,L"x%.0f",sim.speedMultiplier),b));
     LabelValue(hdc,x,baseY+step*2,contentW,L"Мощность панели",(swprintf_s(b,L"%.0f Вт",sim.panelMaxPowerW),b));
     LabelValue(hdc,x,baseY+step*3,contentW,L"Мощность лампы",(swprintf_s(b,L"%.0f Вт",sim.lampPowerW),b));
     LabelValue(hdc,x,baseY+step*4,contentW,L"Ёмкость аккумулятора",(swprintf_s(b,L"%.0f Вт·ч",sim.batteryCapacityWh),b));
-    // Status footer
-    SelectObject(hdc,footerFont); Text(hdc,x,H-28,sim.isPaused?L"Симуляция приостановлена":sim.isRunning?L"Симуляция запущена":L"Нажмите «Старт»",RGB(125,139,154));
     SelectObject(hdc,old);DeleteObject(font);DeleteObject(bold);DeleteObject(footerFont);
 }

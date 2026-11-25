@@ -21,7 +21,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     HWND hwnd = CreateWindowExW(
         0, CLASS_NAME, L"SolarSaver",
         WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
-        CW_USEDEFAULT, CW_USEDEFAULT, 1400, 900,
+        CW_USEDEFAULT, CW_USEDEFAULT, 1100, 700,
         NULL, NULL, hInstance, NULL
     );
 
