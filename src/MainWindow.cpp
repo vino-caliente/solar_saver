@@ -59,7 +59,7 @@ LRESULT CALLBACK MainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
         MoveWindow(hBtnReset, x + (btnW + buttonGap) * 2, top, btnW, 38, TRUE);
         int sliderW = contentW;
         // The renderer places labels/value rows at these coordinates; sliders sit directly beneath each row.
-        int baseY = 374, step = (H < 760 ? 58 : 68);
+        int baseY = 434, step = (H < 760 ? 58 : 68);
         MoveWindow(hSliderRain,  x, baseY, sliderW, 32, TRUE);
         MoveWindow(hSliderSpeed, x, baseY + step, sliderW, 32, TRUE);
         MoveWindow(hSliderPanel, x, baseY + step * 2, sliderW, 32, TRUE);

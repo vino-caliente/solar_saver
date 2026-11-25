@@ -9,14 +9,14 @@ static int g_sceneW = 0, g_sceneH = 0;
 static HBITMAP g_flowBitmaps[8] = {};
 static int g_flowW[8] = {}, g_flowH[8] = {};
 static const wchar_t* g_flowFiles[8] = {
-    L"scene_panel.bmp", L"scene_panel_surplus_to_battery.bmp",
-    L"scene_panel+battery.bmp", L"scene_panel+battery+grid.bmp",
-    L"scene_panel+grid.bmp", L"scene_battery.bmp",
-    L"scene_battery+grid.bmp", L"scene_grid.bmp"
+    L"images\\scene_panel.bmp", L"images\\scene_panel_surplus_to_battery.bmp",
+    L"images\\scene_panel+battery.bmp", L"images\\scene_panel+battery+grid.bmp",
+    L"images\\scene_panel+grid.bmp", L"images\\scene_battery.bmp",
+    L"images\\scene_battery+grid.bmp", L"images\\scene_grid.bmp"
 };
 static void EnsureSceneBitmap() {
     static bool tried = false; if (g_sceneBitmap || tried) return; tried = true;
-    g_sceneBitmap = (HBITMAP)LoadImageW(GetModuleHandleW(NULL), L"scene.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+    g_sceneBitmap = (HBITMAP)LoadImageW(GetModuleHandleW(NULL), L"images\\scene.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
     if (g_sceneBitmap) { BITMAP bm; GetObject(g_sceneBitmap, sizeof(bm), &bm); g_sceneW = bm.bmWidth; g_sceneH = bm.bmHeight; }
     for (int i = 0; i < 8; ++i) {
         g_flowBitmaps[i] = (HBITMAP)LoadImageW(GetModuleHandleW(NULL), g_flowFiles[i], IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
@@ -101,8 +101,17 @@ void Renderer::DrawScene(HDC hdc,int W,int H,const SimState& sim) {
     Text(hdc,x,y,sim.isRainingToday?L"Дождливая погода":L"Солнечная погода",RGB(165,177,190)); y+=26;
     swprintf_s(b,L"Солнечная энергия: %.0f%%",sim.energyIncomePercent*100); Text(hdc,x,y,b,RGB(232,239,247)); y+=23;
     swprintf_s(b,L"Экономия: %.0f%%",sim.savingPercent); Text(hdc,x,y,b,RGB(91,210,164)); y+=24;
+    Text(hdc,x,y,L"Заряд аккумулятора",RGB(158,170,185)); y+=22;
+    const int barW=contentW, barH=16;
+    RoundBox(hdc,x,y,barW,barH,8,RGB(48,56,67));
+    float chargeRatio = (sim.batteryCapacityWh > 0.0f) ? sim.batteryStoredWh / sim.batteryCapacityWh : 0.0f;
+    chargeRatio = std::clamp(chargeRatio,0.0f,1.0f);
+    int chargeW=(int)(barW*chargeRatio);
+    if(chargeW>0) RoundBox(hdc,x,y,chargeW,barH,8,RGB(91,210,164));
+    swprintf_s(b,L"%.0f / %.0f Вт·ч",sim.batteryStoredWh,sim.batteryCapacityWh);
+    Text(hdc,x,y+22,b,RGB(232,239,247)); y+=48;
     // Controls captions are placed above their corresponding slider positions in MainWindow.
-    int baseY=350, step=(H<760?58:68);
+    int baseY=410, step=(H<760?58:68);
     LabelValue(hdc,x,baseY,contentW,L"Вероятность дождя",(swprintf_s(b,L"%d%%",(int)(sim.rainProbability*100)),b));
     LabelValue(hdc,x,baseY+step,contentW,L"Скорость симуляции",(swprintf_s(b,L"x%.0f",sim.speedMultiplier),b));
     LabelValue(hdc,x,baseY+step*2,contentW,L"Мощность панели",(swprintf_s(b,L"%.0f Вт",sim.panelMaxPowerW),b));
